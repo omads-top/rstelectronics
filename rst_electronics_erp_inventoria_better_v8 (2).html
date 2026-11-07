@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>RST Electronics ERP v8 — Inventoria Better Edition</title>
+<style>
+:root{
+  --bg:#f4f7fb;--panel:#fff;--ink:#142033;--muted:#64748b;--line:#e2e8f0;
+  --brand:#4f46e5;--brand2:#7c3aed;--good:#059669;--warn:#d97706;--bad:#dc2626;
+  --nav:#0b1220;--nav2:#111a2b;--radius:16px;--shadow:0 10px 35px rgba(15,23,42,.08);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+a{text-decoration:none;color:inherit}
+.hidden{display:none!important}
+.app{min-height:100vh;display:flex}
+.sidebar{width:270px;background:linear-gradient(180deg,var(--nav),#0d1728 68%,#0a1020);color:#cbd5e1;position:fixed;left:0;top:0;bottom:0;z-index:50;overflow:auto}
+.brand{padding:22px 20px;border-bottom:1px solid rgba(255,255,255,.08)}
+.brand-badge{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,var(--brand),var(--brand2));display:grid;place-items:center;color:white;font-weight:900}
+.brand-row{display:flex;align-items:center;gap:12px}
+.brand-title{font-weight:900;color:#fff;font-size:16px}
+.brand-sub{font-size:10px;color:#94a3b8;letter-spacing:.12em;text-transform:uppercase;margin-top:2px}
+.nav{padding:14px 12px}
+.nav-section{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:#64748b;padding:14px 10px 8px}
+.nav button{width:100%;display:flex;gap:11px;align-items:center;border:0;background:transparent;color:#cbd5e1;padding:10px 12px;border-radius:11px;margin:3px 0;text-align:left;font-weight:700;font-size:13px}
+.nav button:hover,.nav button.active{background:rgba(99,102,241,.18);color:#fff}
+.nav .ic{width:20px;text-align:center}
+.main{margin-left:270px;flex:1;min-width:0}
+.topbar{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 22px}
+.top-left{display:flex;align-items:center;gap:12px}
+.topbar h1{margin:0;font-size:17px}
+.kbd{padding:4px 7px;border:1px solid var(--line);border-bottom-width:2px;border-radius:7px;background:#fff;color:var(--muted);font-size:10px}
+.content{padding:22px;max-width:1600px;margin:auto}
+.grid{display:grid;gap:16px}
+.grid4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.grid3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.grid2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.card-head{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px}
+.card-body{padding:18px}
+.stat{padding:18px;position:relative;overflow:hidden}
+.stat .label{font-size:11px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+.stat .value{font-size:27px;font-weight:900;margin-top:7px}
+.stat .hint{font-size:11px;color:var(--muted);margin-top:7px}
+.stat .icon{position:absolute;right:16px;top:14px;font-size:26px;opacity:.28}
+.toolbar{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+.btn{border:1px solid var(--line);background:#fff;color:var(--ink);padding:9px 13px;border-radius:10px;font-weight:800;font-size:12px}
+.btn:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(15,23,42,.08)}
+.btn.primary{background:linear-gradient(135deg,var(--brand),var(--brand2));border-color:transparent;color:#fff}
+.btn.good{background:#ecfdf5;border-color:#a7f3d0;color:#047857}
+.btn.warn{background:#fff7ed;border-color:#fed7aa;color:#b45309}
+.btn.bad{background:#fef2f2;border-color:#fecaca;color:#b91c1c}
+.btn.dark{background:#0f172a;color:#fff;border-color:#0f172a}
+.btn.ghost{background:transparent}
+.input,.select,.textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 11px;background:#fff;outline:none}
+.input:focus,.select:focus,.textarea:focus{border-color:#818cf8;box-shadow:0 0 0 3px rgba(99,102,241,.12)}
+.form-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:12px}
+.col12{grid-column:span 12}.col8{grid-column:span 8}.col6{grid-column:span 6}.col4{grid-column:span 4}.col3{grid-column:span 3}
+.label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:900;color:var(--muted);margin:0 0 6px}
+.table-wrap{overflow:auto}
+table{width:100%;border-collapse:collapse;min-width:760px}
+th,td{padding:12px 13px;border-bottom:1px solid #eef2f7;font-size:12px;text-align:left;vertical-align:middle}
+th{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#64748b;background:#f8fafc;position:sticky;top:0;z-index:1}
+tr:hover td{background:#fafcff}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 8px;border-radius:999px;font-size:10px;font-weight:900}
+.b-good{background:#ecfdf5;color:#047857}.b-warn{background:#fff7ed;color:#b45309}.b-bad{background:#fef2f2;color:#b91c1c}.b-blue{background:#eef2ff;color:#4338ca}.b-gray{background:#f1f5f9;color:#475569}
+.search{width:min(420px,45vw)}
+.modal-backdrop{position:fixed;inset:0;background:rgba(2,6,23,.55);display:grid;place-items:center;z-index:100;padding:20px}
+.modal{width:min(1100px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:18px;box-shadow:0 35px 90px rgba(2,6,23,.35)}
+.modal-head{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.modal-body{padding:18px}
+.modal-foot{padding:14px 18px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;padding:10px 18px;border-bottom:1px solid var(--line)}
+.tab{border:0;background:#f8fafc;padding:8px 11px;border-radius:9px;font-weight:800;font-size:11px;color:#475569}
+.tab.active{background:#eef2ff;color:#4338ca}
+.empty{padding:36px;text-align:center;color:var(--muted)}
+.notice{padding:12px 14px;border-radius:11px;background:#eef2ff;color:#3730a3;font-size:12px}
+.notice.warn{background:#fff7ed;color:#9a3412}.notice.good{background:#ecfdf5;color:#065f46}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.list{display:flex;flex-direction:column;gap:8px}
+.list-row{display:flex;justify-content:space-between;gap:12px;padding:11px 12px;border:1px solid var(--line);border-radius:11px}
+.small{font-size:11px}.muted{color:var(--muted)}
+.right{text-align:right}
+.center{text-align:center}
+hr{border:0;border-top:1px solid var(--line);margin:16px 0}
+.footer-note{font-size:10px;color:#94a3b8;padding:20px;text-align:center}
+.mobile-only{display:none}
+.login-screen{min-height:100vh;display:grid;place-items:center;background:radial-gradient(circle at top,#eef2ff,#f8fafc 45%,#eef2f7)}
+.login-card{width:min(420px,92vw);background:#fff;padding:26px;border:1px solid var(--line);border-radius:20px;box-shadow:0 25px 70px rgba(15,23,42,.15)}
+.logo-xl{width:66px;height:66px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;font-size:22px;font-weight:900;margin:0 auto 14px}
+@media(max-width:1100px){.grid4,.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.grid3{grid-template-columns:1fr}.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.main{margin-left:0}.mobile-only{display:block}.topbar{padding:0 14px}}
+@media(max-width:720px){.content{padding:12px}.grid4,.grid2,.kpis{grid-template-columns:1fr}.search{width:100%}.form-grid{grid-template-columns:1fr 1fr}.col12,.col8,.col6,.col4,.col3{grid-column:span 2}.topbar{height:auto;min-height:68px;gap:8px}.topbar h1{font-size:14px}.toolbar{width:100%}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div id="modal-root"></div>
+
+<script>
+(function(){
+'use strict';
+
+const KEY='rst_erp_v8_state';
+
+const defState={
+  auth:{user:'admin',pass:'admin'},
+  settings:{
+    business:'RST Electronics', legal:'RST ELECTRONICS & SMART SECURITY SOLUTIONS',
+    cr:'', vat:'', phone:'+968 ', email:'', address:'Mabellah, Muscat, Oman',
+    currency:'OMR', tax:0.05, invoicePrefix:'INV-', quotePrefix:'Q-', orderPrefix:'SO-',
+    creditPrefix:'CN-', receiptPrefix:'RC-', dealerPrefix:'D-', defaultTerms:'Payment due within 14 days.',
+    language:'en', dateFormat:'DD/MM/YYYY', decimals:3,
+    lowStock:5, negativeStock:false, invoiceNotes:'Thank you for your business.',
+    webAccess:true, emailEnabled:false, backupReminder:true, pageSize:'A4'
+  },
+  users:[{id:1,name:'Administrator',username:'admin',role:'Administrator',active:true}],
+  salespeople:[{id:1,name:'Admin'}],
+  categories:[{id:1,name:'Smartphones'},{id:2,name:'CCTV'},{id:3,name:'Networking'},{id:4,name:'Accessories'},{id:5,name:'Smart Locks'}],
+  locations:[{id:1,name:'Main Store'},{id:2,name:'Warehouse'},{id:3,name:'Repair Center'}],
+  items:[
+    {id:1,sku:'PHONE-IP15PM',name:'iPhone 15 Pro Max 256GB',category:'Smartphones',location:'Main Store',cost:450,price:520,stock:12,reorder:3,barcode:'8901001',serialTrack:true,unit:'pcs',taxable:true},
+    {id:2,sku:'PHONE-S24U',name:'Samsung Galaxy S24 Ultra',category:'Smartphones',location:'Main Store',cost:420,price:485,stock:8,reorder:2,barcode:'8901002',serialTrack:true,unit:'pcs',taxable:true},
+    {id:3,sku:'CCTV-4K-KIT',name:'HIKVISION 4K CCTV Kit (4 Cam)',category:'CCTV',location:'Warehouse',cost:120,price:165.5,stock:15,reorder:5,barcode:'8902001',serialTrack:false,unit:'set',taxable:true},
+    {id:4,sku:'LOCK-BIO-01',name:'Smart Biometric Door Lock',category:'Smart Locks',location:'Warehouse',cost:75,price:110,stock:6,reorder:2,barcode:'8903001',serialTrack:false,unit:'pcs',taxable:true},
+    {id:5,sku:'INTERCOM-7',name:'Video Intercom 7" Touch Screen',category:'Networking',location:'Repair Center',cost:60,price:89,stock:10,reorder:3,barcode:'8904001',serialTrack:false,unit:'pcs',taxable:true}
+  ],
+  customers:[
+    {id:1,code:'C0001',name:'Walk-in Customer',phone:'+968 90000000',email:'',group:'Retail',credit:0,balance:0,address:'',salesperson:'Admin'},
+    {id:2,code:'C0002',name:'Mohammed Al-Balushi',phone:'+968 91234567',email:'',group:'VIP',credit:500,balance:25,address:'Muscat',salesperson:'Admin'},
+    {id:3,code:'C0003',name:'Salim Al-Harthy',phone:'+968 99887766',email:'',group:'Retail',credit:200,balance:0,address:'Seeb',salesperson:'Admin'}
+  ],
+  suppliers:[
+    {id:1,code:'S0001',name:'Gulf Electronics Supply',phone:'+968 24000000',email:'',balance:0,address:'Muscat'},
+    {id:2,code:'S0002',name:'Smart Security Distribution',phone:'+968 25000000',email:'',balance:0,address:'Ruwi'}
+  ],
+  dealers:[
+    {id:1,code:'D0001',name:'Muscat Mobile & Tech Dealer',phone:'+968 95551234',email:'dealer1@muscattech.om',tier:'Tier 1 (Wholesale)',margin:12.5,balance:0,address:'Ruwi, Muscat'},
+    {id:2,code:'D0002',name:'Salalah Smart Hub',phone:'+968 94448888',email:'salalah@smarthub.om',tier:'Tier 2 (Distributor)',margin:18.0,balance:140.5,address:'Salalah'}
+  ],
+  telecomBills:[
+    {id:1,ref:'TEL-2026-001',provider:'Omantel',serviceType:'Postpaid Mobile / Fiber',accountNo:'98765432',customerName:'Ahmed Al-Kindi',amount:45.000,commission:1.250,date:'2026-06-06',status:'Paid'},
+    {id:2,ref:'TEL-2026-002',provider:'Ooredoo',serviceType:'Mobile Recharge / Topup',accountNo:'92345678',customerName:'Fatma Al-Zadjali',amount:10.000,commission:0.400,date:'2026-06-07',status:'Paid'}
+  ],
+  utilityBills:[
+    {id:1,ref:'UTL-2026-001',utility:'Nama Power & Water (Electricity)',accountNo:'100293847',customerName:'Saeed Al-Habsi',amount:38.450,commission:0.500,date:'2026-06-06',status:'Paid'},
+    {id:2,ref:'UTL-2026-002',utility:'Nama Power & Water (Water)',accountNo:'200492817',customerName:'Maryam Al-Lawati',amount:14.200,commission:0.300,date:'2026-06-07',status:'Paid'}
+  ],
+  quotes:[
+    {id:1,no:'Q-2026-001',customer:'Salim Al-Harthy',date:'2026-06-06',valid:'2026-06-20',status:'Pending',subtotal:165.5,tax:8.275,total:173.775,notes:'Valid for 14 days',lines:[{itemId:3,name:'HIKVISION 4K CCTV Kit (4 Cam)',qty:1,price:165.5}]}
+  ],
+  orders:[
+    {id:1,no:'SO-2026-001',customer:'Mohammed Al-Balushi',date:'2026-06-07',status:'Confirmed',subtotal:520,tax:26,total:546,source:'Quote',lines:[{itemId:1,name:'iPhone 15 Pro Max 256GB',qty:1,price:520}]}
+  ],
+  invoices:[
+    {id:1,no:'INV-2026-001',customer:'Mohammed Al-Balushi',date:'2026-06-06',due:'2026-06-20',status:'Partially Paid',subtotal:520,tax:26,total:546,paid:100,method:'Cash',lines:[{itemId:1,name:'iPhone 15 Pro Max 256GB',qty:1,price:520}]},
+    {id:2,no:'INV-2026-002',customer:'Walk-in Customer',date:'2026-06-07',due:'2026-06-07',status:'Paid',subtotal:165.5,tax:8.275,total:173.775,paid:173.775,method:'Card',lines:[{itemId:3,name:'HIKVISION 4K CCTV Kit (4 Cam)',qty:1,price:165.5}]}
+  ],
+  payments:[{id:1,receipt:'RC-2026-001',invoice:'INV-2026-001',customer:'Mohammed Al-Balushi',date:'2026-06-10',amount:100,method:'Cash',reference:'',notes:''}],
+  creditNotes:[],
+  refunds:[],
+  recurringInvoices:[],
+  recurringOrders:[],
+  transfers:[],
+  receipts:[],
+  expenses:[
+    {id:1,date:'2026-06-06',category:'Shop Rent',amount:120,notes:'Monthly rent'},
+    {id:2,date:'2026-06-07',category:'Electricity Bill',amount:35.2,notes:''}
+  ],
+  bom:[],
+  activity:[]
+};
+
+let state=loadState();
+let page='dashboard';
+let modalOpen=false;
+
+function loadState(){
+  try{
+    const raw=localStorage.getItem(KEY);
+    if(raw){return deepMerge(JSON.parse(raw),defState);}
+  }catch(e){}
+  return JSON.parse(JSON.stringify(defState));
+}
+function deepMerge(a,b){
+  if(Array.isArray(a)||Array.isArray(b)) return a!==undefined?a:b;
+  if(a&&typeof a==='object'&&b&&typeof b==='object'){
+    const o={...b};
+    Object.keys(a).forEach(k=>o[k]=deepMerge(a[k],b[k]));
+    return o;
+  }
+  return a!==undefined?a:b;
+}
+function save(){
+  localStorage.setItem(KEY,JSON.stringify(state));
+}
+function uid(){return Date.now()+Math.floor(Math.random()*1000)}
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function money(v){return Number(v||0).toFixed(state.settings.decimals)+' '+state.settings.currency}
+function num(v){return Number.parseFloat(v)||0}
+function today(){return new Date().toISOString().slice(0,10)}
+function sum(arr,fn){return arr.reduce((s,x)=>s+num(fn(x)),0)}
+function totalInvoiceBalance(i){return Math.max(0,num(i.total)-num(i.paid))}
+function statusBadge(s){
+  const cls=(s==='Paid'||s==='Confirmed'||s==='Completed'||s==='Received')?'b-good':(s==='Pending'||s==='Partially Paid'||s==='Draft'||s==='Scheduled')?'b-warn':(s==='Cancelled'||s==='Overdue')?'b-bad':'b-blue';
+  return `<span class="badge ${cls}">${esc(s)}</span>`;
+}
+function log(msg){
+  state.activity.unshift({id:uid(),date:new Date().toLocaleString(),msg});
+  state.activity=state.activity.slice(0,120);
+  save();
+}
+function toast(msg){
+  const x=document.createElement('div');
+  x.style.cssText='position:fixed;right:18px;bottom:18px;z-index:999;background:#0f172a;color:#fff;padding:12px 15px;border-radius:11px;font-weight:800;font-size:12px;box-shadow:0 10px 35px rgba(0,0,0,.2)';
+  x.textContent=msg;document.body.appendChild(x);setTimeout(()=>x.remove(),2500);
+}
+function htmlField(label,name,value='',type='text',extra=''){
+  return `<div class="col6"><label class="label">${label}</label><input class="input" name="${name}" type="${type}" value="${esc(value)}" ${extra}></div>`;
+}
+function selectField(label,name,options,value=''){
+  return `<div class="col6"><label class="label">${label}</label><select class="select" name="${name}">${options.map(o=>`<option ${String(o)===String(value)?'selected':''}>${esc(o)}</option>`).join('')}</select></div>`;
+}
+function openModal(title,body,foot=''){
+  modalOpen=true;
+  document.getElementById('modal-root').innerHTML=`<div class="modal-backdrop" id="modalBg"><div class="modal">
+    <div class="modal-head"><h3 style="margin:0;font-size:16px">${esc(title)}</h3><button class="btn" onclick="closeModal()">✕</button></div>
+    <div class="modal-body">${body}</div>${foot?`<div class="modal-foot">${foot}</div>`:''}
+  </div></div>`;
+}
+function closeModal(){modalOpen=false;document.getElementById('modal-root').innerHTML='';}
+function downloadFile(name,content,type='application/json'){
+  const blob=new Blob([content],{type});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+function printHtml(title,body){
+  const w=window.open('','_blank');
+  if(!w){toast('Popup blocked — allow popups to print');return}
+  w.document.write(`<!doctype html><html><head><title>${esc(title)}</title><style>
+  body{font-family:Arial,sans-serif;color:#111;padding:30px}h1{font-size:22px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #bbb;padding:7px;font-size:12px}th{background:#f1f5f9;text-align:left}.right{text-align:right}.muted{color:#666}
+  .head{display:flex;justify-content:space-between;border-bottom:2px solid #111;padding-bottom:12px;margin-bottom:18px}.small{font-size:11px}
+  </style></head><body>${body}<script>window.print()<\/script></body></html>`);
+  w.document.close();
+}
+function docLinesTable(lines){
+  return `<table><thead><tr><th>#</th><th>Item</th><th>Qty</th><th class="right">Price</th><th class="right">Total</th></tr></thead><tbody>${
+    lines.map((l,i)=>`<tr><td>${i+1}</td><td>${esc(l.name)}</td><td>${l.qty}</td><td class="right">${money(l.price)}</td><td class="right">${money(l.price*l.qty)}</td></tr>`).join('')
+  }</tbody></table>`;
+}
+function printInvoice(inv){
+  const body=`<div class="head"><div><h1>${esc(state.settings.business)}</h1><div class="small">${esc(state.settings.legal)}<br>${esc(state.settings.address)}<br>${esc(state.settings.phone)} ${esc(state.settings.email)}</div></div><div><h1>INVOICE</h1><div class="small">No: ${esc(inv.no)}<br>Date: ${esc(inv.date)}<br>Due: ${esc(inv.due)}</div></div></div>
+  <p><b>Bill To:</b> ${esc(inv.customer)}</p>${docLinesTable(inv.lines)}
+  <div style="margin-top:18px;max-width:300px;margin-left:auto"><p class="right">Subtotal: ${money(inv.subtotal)}</p><p class="right">Tax: ${money(inv.tax)}</p><h2 class="right">Total: ${money(inv.total)}</h2><p class="right">Paid: ${money(inv.paid)}</p><p class="right"><b>Balance: ${money(totalInvoiceBalance(inv))}</b></p></div>
+  <hr><div class="small">${esc(state.settings.invoiceNotes)}</div>`;
+  printHtml(inv.no,body);
+}
+function printQuote(q){
+  const body=`<div class="head"><div><h1>${esc(state.settings.business)}</h1><div class="small">${esc(state.settings.address)}<br>${esc(state.settings.phone)}</div></div><div><h1>QUOTATION</h1><div class="small">No: ${esc(q.no)}<br>Date: ${esc(q.date)}<br>Valid Until: ${esc(q.valid)}</div></div></div><p><b>Customer:</b> ${esc(q.customer)}</p>${docLinesTable(q.lines)}<div style="margin-top:18px;text-align:right"><div>Subtotal: ${money(q.subtotal)}</div><div>Tax: ${money(q.tax)}</div><h2>Total: ${money(q.total)}</h2></div><hr><div class="small">${esc(q.notes||state.settings.defaultTerms)}</div>`;
+  printHtml(q.no,body);
+}
+function renderLogin(){
+  document.getElementById('root').innerHTML=`<div class="login-screen"><div class="login-card">
+    <div class="logo-xl">RST</div><h2 style="text-align:center;margin:0 0 6px;font-size:24px">RST Electronics ERP</h2>
+    <p class="muted center" style="margin-top:0">Inventoria Better Edition · Offline Browser Edition</p>
+    <form id="loginForm" style="margin-top:20px">
+      <label class="label">Username</label><input class="input" name="u" value="admin">
+      <label class="label" style="margin-top:12px">Password</label><input class="input" name="p" type="password" value="admin">
+      <button class="btn primary" style="width:100%;margin-top:16px">Secure Login</button>
+    </form>
+    <div class="notice" style="margin-top:14px">Demo access: <b>admin / admin</b>. Change credentials from User Management.</div>
+  </div></div>`;
+  document.getElementById('loginForm').onsubmit=e=>{
+    e.preventDefault();const fd=new FormData(e.target);
+    if(fd.get('u')===state.auth.user && fd.get('p')===state.auth.pass){sessionStorage.setItem('rst_auth','1');renderApp()}else toast('Invalid username or password');
+  };
+}
+const NAV=[
+ ['dashboard','▦','Dashboard'],
+ ['pos','▣','POS / Cash Sale'],
+ ['telecom','⚡','Telecom & Bills'],
+ ['dealers','🤝','Dealers Network'],
+ ['quotes','✎','Quotes'],
+ ['orders','▤','Sales Orders'],
+ ['invoices','▤','Invoices'],
+ ['payments','◉','Payments'],
+ ['recurring','↻','Recurring'],
+ ['customers','👥','Customers'],
+ ['suppliers','◼','Suppliers'],
+ ['inventory','▦','Items / Inventory'],
+ ['stock','⇄','Stock Operations'],
+ ['credit','↩','Credit Notes / Refunds'],
+ ['reports','◒','Reports'],
+ ['users','⚿','Users & Salespeople'],
+ ['import','⇩','CSV Import Wizard'],
+ ['backup','⬒','Backup / Restore'],
+ ['settings','⚙','Master Settings'],
+ ['tools','⚒','Tools / Integration']
+];
+
+function renderApp(){
+  document.getElementById('root').innerHTML=`<div class="app">
+    <aside class="sidebar" id="sidebar"><div class="brand"><div class="brand-row"><div class="brand-badge">${esc((state.settings.business||'RST').slice(0,3).toUpperCase())}</div><div><div class="brand-title">${esc(state.settings.business)}</div><div class="brand-sub">ERP v8 · Inventoria Better</div></div></div></div>
+      <nav class="nav">
+        <div class="nav-section">Workspace</div>${NAV.slice(0,14).map(n=>navBtn(n)).join('')}
+        <div class="nav-section">Administration</div>${NAV.slice(14).map(n=>navBtn(n)).join('')}
+      </nav>
+      <div class="footer-note">Local-first browser edition<br>Data stored in this browser</div>
+    </aside>
+    <main class="main"><header class="topbar">
+      <div class="top-left"><button class="btn mobile-only" onclick="toggleSidebar()">☰</button><h1 id="pageTitle">Dashboard</h1></div>
+      <div class="toolbar"><input id="globalSearch" class="input search" placeholder="Search customers, dealers, invoices, items… (Ctrl+K)" oninput="globalSearch(this.value)">
+      <span class="kbd">Ctrl+K</span><button class="btn" onclick="quickNew()">＋ New</button><button class="btn dark" onclick="logout()">Logout</button></div>
+    </header><section class="content" id="content"></section></main>
+  </div>`;
+  showPage(page);
+}
+function navBtn(n){return `<button data-page="${n[0]}" class="${page===n[0]?'active':''}" onclick="showPage('${n[0] }')"><span class="ic">${n[1]}</span>${esc(n[2])}</button>`}
+function toggleSidebar(){document.getElementById('sidebar')?.classList.toggle('open')}
+function logout(){sessionStorage.removeItem('rst_auth');location.reload()}
+function setPageTitle(title){document.getElementById('pageTitle').textContent=title}
+function showPage(p){
+  page=p;document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===p));
+  if(window.innerWidth<1100) document.getElementById('sidebar')?.classList.remove('open');
+  const titles={dashboard:'Dashboard',pos:'POS / Cash Sale',telecom:'Telecom & Utility Bill Payments',dealers:'Dealers Network',quotes:'Quotes',orders:'Sales Orders',invoices:'Invoices',payments:'Payments',recurring:'Recurring Schedules',customers:'Customers & CRM',suppliers:'Suppliers',inventory:'Items / Inventory',stock:'Stock Operations',credit:'Credit Notes / Refunds',reports:'Reports',users:'Users & Salespeople',import:'CSV Import Wizard',backup:'Data Backup & Restore',settings:'Master Settings',tools:'Tools / Integration'};
+  setPageTitle(titles[p]||p); renderContent();
+}
+function renderContent(){
+  const c=document.getElementById('content'); if(!c)return;
+  const f={dashboard:pageDashboard,pos:pagePOS,telecom:pageTelecom,dealers:pageDealers,quotes:pageQuotes,orders:pageOrders,invoices:pageInvoices,payments:pagePayments,recurring:pageRecurring,customers:pageCustomers,suppliers:pageSuppliers,inventory:pageInventory,stock:pageStock,credit:pageCredit,reports:pageReports,users:pageUsers,import:pageImport,backup:pageBackup,settings:pageSettings,tools:pageTools}[page];
+  c.innerHTML=f?f():'';
+  bindDynamic();
+}
+function bindDynamic(){}
+function pageDashboard(){
+  const sales=sum(state.invoices,i=>i.total), paid=sum(state.invoices,i=>i.paid), due=sum(state.invoices,totalInvoiceBalance);
+  const stockValue=sum(state.items,i=>i.cost*i.stock), low=state.items.filter(i=>i.stock<=num(i.reorder??state.settings.lowStock)).length;
+  const dealerBal=sum(state.dealers,d=>d.balance);
+  return `<div class="grid grid4">
+    ${statCard('Sales / Invoices',money(sales),'Total invoice value','↗')}${statCard('Collected',money(paid),'Payments received','◉')}
+    ${statCard('Dealers Balance',money(dealerBal),`${state.dealers.length} registered dealers`,'🤝')}${statCard('Stock Value',money(stockValue),`${low} low-stock items`,'▦')}
+  </div>
+  <div style="height:16px"></div><div class="grid grid2">
+    <div class="card"><div class="card-head"><b>Quick Actions</b><div class="toolbar">${['Quote','Sales Order','Invoice','Dealer','Telecom Bill','Utility Bill'].map((x,i)=>`<button class="btn ${i===2?'primary':''}" onclick="quickNew('${x.toLowerCase().replace(' ','')}')">＋ ${x}</button>`).join('')}</div></div><div class="card-body"><div class="grid grid3">
+      ${[
+        ['Unpaid Invoices',state.invoices.filter(i=>totalInvoiceBalance(i)>0).length,'invoices'],
+        ['Dealers Hub',state.dealers.length,'dealers'],
+        ['Telecom & Bills',state.telecomBills.length+state.utilityBills.length,'telecom']
+      ].map(x=>`<div class="list-row"><div><b>${x[0]}</b><div class="small muted">${x[1]} records</div></div><button class="btn" onclick="showPage('${x[2]}')">Open</button></div>`).join('')}
+    </div></div></div>
+    <div class="card"><div class="card-head"><b>Recent Activity</b></div><div class="card-body"><div class="list">${(state.activity.length?state.activity: [{date:new Date().toLocaleString(),msg:'System ready'}]).slice(0,8).map(a=>`<div class="list-row"><div class="small">${esc(a.msg)}</div><div class="small muted">${esc(a.date)}</div></div>`).join('')}</div></div></div>
+  </div>
+  <div style="height:16px"></div><div class="grid grid2">
+    <div class="card"><div class="card-head"><b>Low Stock Alerts</b><button class="btn" onclick="showPage('inventory')">Inventory</button></div><div class="card-body">${state.items.filter(i=>i.stock<=num(i.reorder??state.settings.lowStock)).map(i=>`<div class="list-row"><div><b>${esc(i.name)}</b><div class="small muted">${esc(i.sku)} · ${i.location}</div></div><span class="badge b-bad">${i.stock} ${i.unit}</span></div>`).join('')||`<div class="empty">No low-stock items.</div>`}</div></div>
+    <div class="card"><div class="card-head"><b>Dealers Profit & Tier Overview</b><button class="btn" onclick="showPage('dealers')">Dealers</button></div><div class="card-body">${state.dealers.map(d=>`<div class="list-row"><div><b>${esc(d.name)}</b><div class="small muted">${esc(d.tier)} · Margin: ${d.margin}%</div></div><b class="right">${money(d.balance)}</b></div>`).join('')||'<div class="empty">No dealers registered.</div>'}</div></div>
+  </div>`;
+}
+function statCard(label,val,hint,icon){return `<div class="card stat"><div class="label">${label}</div><div class="value">${val}</div><div class="hint">${hint}</div><div class="icon">${icon}</div></div>`}
+
+function pagePOS(){
+  return `<div class="grid grid2">
+    <div class="card"><div class="card-head"><b>Product Search / Barcode</b><div class="toolbar"><input id="posSearch" class="input" placeholder="Name / SKU / Barcode" oninput="renderPOSProducts(this.value)"></div></div><div class="card-body"><div id="posProducts" class="grid grid3"></div></div></div>
+    <div class="card"><div class="card-head"><b>Current Sale</b><button class="btn bad" onclick="clearCart()">Clear</button></div><div class="card-body">
+      <div class="toolbar">
+        <select id="posCustomerType" class="select" onchange="togglePosCustomerType(this.value)"><option value="customer">Retail Customer</option><option value="dealer">Dealer (Tiered Margin)</option></select>
+        <select id="posCustomer" class="select"><option>Walk-in Customer</option>${state.customers.filter(c=>c.name!=='Walk-in Customer').map(c=>`<option>${esc(c.name)}</option>`).join('')}</select>
+        <select id="posMethod" class="select"><option>Cash</option><option>Card</option><option>Bank Transfer</option><option>Credit / Ledger</option></select>
+      </div>
+      <div id="dealerNotice" class="notice good hidden" style="margin-top:10px">Dealer pricing and tier margin applied automatically.</div>
+      <div id="cartBox" style="margin-top:12px"></div>
+    </div></div>
+  </div>`;
+}
+let posIsDealer=false;
+function togglePosCustomerType(val){
+  posIsDealer=(val==='dealer');
+  const sel=document.getElementById('posCustomer');
+  if(posIsDealer){
+    sel.innerHTML=state.dealers.map(d=>`<option value="${esc(d.name)}" data-margin="${d.margin}">${esc(d.name)} (${d.tier} - ${d.margin}%)</option>`).join('')||'<option>No Dealers Available</option>';
+    document.getElementById('dealerNotice')?.classList.remove('hidden');
+  } else {
+    sel.innerHTML=`<option>Walk-in Customer</option>`+state.customers.filter(c=>c.name!=='Walk-in Customer').map(c=>`<option>${esc(c.name)}</option>`).join('');
+    document.getElementById('dealerNotice')?.classList.add('hidden');
+  }
+  renderCart();
+}
+function renderPOSProducts(q=''){
+  const el=document.getElementById('posProducts');if(!el)return;
+  q=q.toLowerCase();
+  const arr=state.items.filter(i=>`${i.name} ${i.sku} ${i.barcode}`.toLowerCase().includes(q));
+  el.innerHTML=arr.map(i=>`<button class="btn" style="text-align:left;padding:13px;height:100%" onclick="cartAdd(${i.id})"><div style="font-weight:900">${esc(i.name)}</div><div class="small muted">${esc(i.sku)} · Stock ${i.stock}</div><div style="margin-top:8px;font-weight:900;color:var(--brand)">${money(i.price)}</div></button>`).join('')||'<div class="empty">No matching products.</div>';
+  renderCart();
+}
+let cart=[];
+function cartAdd(id){
+  const i=state.items.find(x=>x.id===id);if(!i)return;
+  if(i.stock<=0&&!state.settings.negativeStock)return toast('Out of stock');
+  
+  // Apply dealer margin discount if dealer selected
+  let finalPrice=i.price;
+  if(posIsDealer){
+    const dealerName=document.getElementById('posCustomer')?.value;
+    const dealerObj=state.dealers.find(d=>d.name===dealerName);
+    if(dealerObj&&dealerObj.margin>0){
+      finalPrice=i.price*(1-(dealerObj.margin/100));
+    }
+  }
+
+  const x=cart.find(c=>c.itemId===id);
+  if(x)x.qty++;else cart.push({itemId:id,name:i.name,qty:1,price:finalPrice,basePrice:i.price});
+  renderCart();
+}
+function clearCart(){cart=[];renderCart()}
+function renderCart(){
+  const el=document.getElementById('cartBox');if(!el)return;
+  const sub=sum(cart,x=>x.qty*x.price),tax=sub*state.settings.tax,total=sub+tax;
+  el.innerHTML=`<div class="table-wrap"><table style="min-width:0"><thead><tr><th>Item</th><th>Qty</th><th>Price</th><th></th></tr></thead><tbody>${cart.map((x,idx)=>`<tr><td>${esc(x.name)}</td><td><div class="toolbar"><button class="btn" onclick="cartQty(${idx},-1)">−</button><b>${x.qty}</b><button class="btn" onclick="cartQty(${idx},1)">+</button></div></td><td>${money(x.qty*x.price)}</td><td><button class="btn bad" onclick="cartRemove(${idx})">✕</button></td></tr>`).join('')}</tbody></table></div>
+  <div style="margin-top:12px" class="right"><div>Subtotal: <b>${money(sub)}</b></div><div>Tax: <b>${money(tax)}</b></div><h2 style="margin:7px 0">Total: ${money(total)}</h2><button class="btn primary" onclick="completePOS()">Complete Sale & Invoice</button></div>`;
+}
+function cartQty(i,d){cart[i].qty+=d;if(cart[i].qty<=0)cart.splice(i,1);renderCart()}
+function cartRemove(i){cart.splice(i,1);renderCart()}
+function completePOS(){
+  if(!cart.length)return toast('Cart is empty');
+  const customer=document.getElementById('posCustomer').value,method=document.getElementById('posMethod').value;
+  const sub=sum(cart,x=>x.qty*x.price),tax=sub*state.settings.tax,total=sub+tax;
+  for(const l of cart){const it=state.items.find(x=>x.id===l.itemId);if(it&&!state.settings.negativeStock&&it.stock<l.qty)return toast(`Insufficient stock: ${it.name}`)}
+  const inv={id:uid(),no:nextNo('invoice'),customer,date:today(),due:today(),status:method==='Credit / Ledger'?'Unpaid':'Paid',subtotal:sub,tax,total,paid:method==='Credit / Ledger'?0:total,method:method==='Credit / Ledger'?'Credit':method,lines:cart.map(x=>({...x}))};
+  state.invoices.unshift(inv);
+  cart.forEach(l=>{const it=state.items.find(x=>x.id===l.itemId);if(it)it.stock-=l.qty});
+  if(inv.paid) state.payments.unshift({id:uid(),receipt:nextNo('receipt'),invoice:inv.no,customer,date:today(),amount:inv.paid,method:inv.method,reference:'POS',notes:''});
+  
+  if(posIsDealer){
+    const dObj=state.dealers.find(d=>d.name===customer);
+    if(dObj && method==='Credit / Ledger'){
+      dObj.balance+=total;
+    }
+  }
+
+  log(`POS sale ${inv.no} created for ${customer} (${money(total)})`);save();toast('Sale completed');clearCart();showPage('invoices');
+}
+function nextNo(type){
+  const y=new Date().getFullYear();
+  const arr=type==='invoice'?state.invoices:type==='quote'?state.quotes:type==='order'?state.orders:type==='receipt'?state.payments:type==='credit'?state.creditNotes:type==='dealer'?state.dealers:type==='telecom'?state.telecomBills:type==='utility'?state.utilityBills:[];
+  const prefix=type==='invoice'?state.settings.invoicePrefix:type==='quote'?state.settings.quotePrefix:type==='order'?state.settings.orderPrefix:type==='receipt'?state.settings.receiptPrefix:type==='credit'?state.settings.creditPrefix:type==='dealer'?state.settings.dealerPrefix:'B-';
+  return `${prefix}${y}-${String(arr.length+1).padStart(3,'0')}`;
+}
+
+// ----------------------------------------------------
+// TELECOM & BILL PAYMENT HUB
+// ----------------------------------------------------
+function pageTelecom(){
+  return `<div class="grid grid2">
+    <div class="card">
+      <div class="card-head"><b>Oman Telecom Services Hub</b><button class="btn primary" onclick="openTelecomModal()">＋ Process Telecom Topup / Bill</button></div>
+      <div class="card-body">
+        <p class="small muted">Supported Oman Telecom Providers: <b>Omantel, Ooredoo, Vodafone, FRiENDi mobile, Lebara</b></p>
+        <div class="table-wrap" style="margin-top:12px">
+          <table>
+            <thead><tr><th>Ref</th><th>Provider</th><th>Service</th><th>Number / Account</th><th>Amount</th><th>Status</th></tr></thead>
+            <tbody>
+              ${state.telecomBills.map(t=>`<tr><td>${esc(t.ref)}</td><td><b>${esc(t.provider)}</b></td><td>${esc(t.serviceType)}</td><td>${esc(t.accountNo)}</td><td>${money(t.amount)}</td><td>${statusBadge(t.status)}</td></tr>`).join('')||'<tr><td colspan="6" class="empty">No telecom transactions recorded.</td></tr>'}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><b>Utilities & Bill Payments Hub</b><button class="btn primary" onclick="openUtilityModal()">＋ Pay Utility Bill</button></div>
+      <div class="card-body">
+        <p class="small muted">Supported Utilities: <b>Nama Power & Water (Electricity & Water)</b></p>
+        <div class="table-wrap" style="margin-top:12px">
+          <table>
+            <thead><tr><th>Ref</th><th>Utility / Service</th><th>Account / Meter</th><th>Amount</th><th>Status</th></tr></thead>
+            <tbody>
+              ${state.utilityBills.map(u=>`<tr><td>${esc(u.ref)}</td><td><b>${esc(u.utility)}</b></td><td>${esc(u.accountNo)}</td><td>${money(u.amount)}</td><td>${statusBadge(u.status)}</td></tr>`).join('')||'<tr><td colspan="5" class="empty">No utility bills recorded.</td></tr>'}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function openTelecomModal(){
+  openModal('Telecom Topup & Bill Payment',`<form id="telForm"><div class="form-grid">
+    ${selectField('Telecom Provider','provider',['Omantel','Ooredoo','Vodafone','FRiENDi mobile','Lebara'],'Omantel')}
+    ${selectField('Service Type','serviceType',['Postpaid Mobile Bill','Prepaid Recharge / Topup','Fiber / Home Broadband'],'Postpaid Mobile Bill')}
+    ${htmlField('Mobile / Account Number','accountNo','+968 ')}
+    ${htmlField('Customer Name','customerName','')}
+    ${htmlField('Amount (OMR)','amount',10,'number','step="0.001" min="1"')}
+    ${htmlField('Commission / Service Fee','commission',0.500,'number','step="0.001"')}
+  </div></form>`,
+  `<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="processTelecomPayment()">Process Payment</button>`);
+}
+
+function processTelecomPayment(){
+  const fd=new FormData(document.getElementById('telForm'));
+  const provider=fd.get('provider'), serviceType=fd.get('serviceType'), accountNo=fd.get('accountNo'), customerName=fd.get('customerName')||'Walk-in', amount=num(fd.get('amount')), commission=num(fd.get('commission'));
+  if(amount<=0)return toast('Enter valid amount');
+
+  const rec={id:uid(),ref:nextNo('telecom'),provider,serviceType,accountNo,customerName,amount,commission,date:today(),status:'Paid'};
+  state.telecomBills.unshift(rec);
+  
+  // Record revenue in accounting/expense/income ledger as well
+  state.payments.unshift({id:uid(),receipt:nextNo('receipt'),invoice:'TEL-'+rec.ref,customer:customerName,date:today(),amount:amount+commission,method:'Cash',reference:`Telecom: ${provider} (${accountNo})`,notes:`Commission earned: ${money(commission)}`});
+  
+  log(`Telecom payment processed for ${provider}: ${money(amount)} (+ ${money(commission)} fee)`);
+  save();closeModal();toast('Telecom transaction successful');showPage('telecom');
+}
+
+function openUtilityModal(){
+  openModal('Utility Bill Payment (Nama Power & Water)',`<form id="utilForm"><div class="form-grid">
+    ${selectField('Utility Provider & Service','utility',['Nama Power & Water (Electricity)','Nama Power & Water (Water)'],'Nama Power & Water (Electricity)')}
+    ${htmlField('Account / Meter Number','accountNo','')}
+    ${htmlField('Consumer Name','customerName','')}
+    ${htmlField('Bill Amount (OMR)','amount',25,'number','step="0.001" min="1"')}
+    ${htmlField('Service Fee','commission',0.300,'number','step="0.001"')}
+  </div></form>`,
+  `<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="processUtilityPayment()">Pay Utility Bill</button>`);
+}
+
+function processUtilityPayment(){
+  const fd=new FormData(document.getElementById('utilForm'));
+  const utility=fd.get('utility'), accountNo=fd.get('accountNo'), customerName=fd.get('customerName')||'Walk-in', amount=num(fd.get('amount')), commission=num(fd.get('commission'));
+  if(amount<=0)return toast('Enter valid bill amount');
+
+  const rec={id:uid(),ref:nextNo('utility'),utility,accountNo,customerName,amount,commission,date:today(),status:'Paid'};
+  state.utilityBills.unshift(rec);
+  
+  state.payments.unshift({id:uid(),receipt:nextNo('receipt'),invoice:'UTL-'+rec.ref,customer:customerName,date:today(),amount:amount+commission,method:'Cash',reference:`Utility: ${utility} (${accountNo})`,notes:`Fee: ${money(commission)}`});
+
+  log(`Utility bill paid for ${utility} (${accountNo}): ${money(amount)}`);
+  save();closeModal();toast('Utility bill payment successful');showPage('telecom');
+}
+
+// ----------------------------------------------------
+// DEALERS NETWORK MODULE
+// ----------------------------------------------------
+function pageDealers(){
+  return `<div class="card"><div class="card-head"><div><b>Dealers Network & Tiered Margins</b><div class="small muted">${state.dealers.length} registered dealers with custom rate adjustments</div></div><div class="toolbar"><input class="input" placeholder="Search dealers..." oninput="filterTable(this,'dealerTable')"><button class="btn primary" onclick="openDealerForm()">＋ New Dealer</button></div></div><div class="table-wrap"><table id="dealerTable"><thead><tr><th>Code</th><th>Dealer Name</th><th>Tier / Level</th><th>Profit Margin (%)</th><th>Phone</th><th>Ledger Balance</th><th>Actions</th></tr></thead><tbody>${state.dealers.map(d=>`<tr><td>${esc(d.code)}</td><td><b>${esc(d.name)}</b><div class="small muted">${esc(d.email||'')}</div></td><td><span class="badge b-blue">${esc(d.tier)}</span></td><td><b>${d.margin}%</b></td><td>${esc(d.phone)}</td><td>${money(d.balance)}</td><td><button class="btn" onclick="editDealer(${d.id})">Edit / Margins</button> <button class="btn" onclick="dealerStatement('${esc(d.name).replace(/'/g,"\\'")}')">Statement</button></td></tr>`).join('')}</tbody></table></div></div>`;
+}
+
+function openDealerForm(id=null){
+  const d=id?state.dealers.find(x=>x.id===id):null;
+  const title=d?'Edit Dealer':'New Dealer';
+  openModal(title,`<form id="dealerForm"><div class="form-grid">
+    ${htmlField('Dealer Name','name',d?.name||'')}
+    ${htmlField('Phone','phone',d?.phone||'+968 ')}
+    ${htmlField('Email','email',d?.email||'')}
+    ${selectField('Dealer Tier','tier',['Tier 1 (Wholesale)','Tier 2 (Distributor)','Tier 3 (Partner)','VIP Dealer'],d?.tier||'Tier 1 (Wholesale)')}
+    ${htmlField('Profit Margin / Rate Discount (%)','margin',d?.margin||10,'number','step="0.1" min="0" max="100"')}
+    ${htmlField('Opening Ledger Balance','balance',d?.balance||0,'number','step="0.001"')}
+    ${htmlField('Address / Location','address',d?.address||'')}
+  </div></form>`,
+  `<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveDealer(${id||null})">Save Dealer</button>`);
+}
+
+function editDealer(id){openDealerForm(id);}
+
+function saveDealer(id){
+  const fd=new FormData(document.getElementById('dealerForm'));
+  const name=(fd.get('name')||'').trim();if(!name)return toast('Dealer name required');
+  const tier=fd.get('tier'), margin=num(fd.get('margin')), balance=num(fd.get('balance')), phone=fd.get('phone'), email=fd.get('email'), address=fd.get('address');
+
+  if(id){
+    const d=state.dealers.find(x=>x.id===id);
+    if(d){d.name=name;d.tier=tier;d.margin=margin;d.balance=balance;d.phone=phone;d.email=email;d.address=address;}
+    toast('Dealer updated');
+  } else {
+    state.dealers.push({id:uid(),code:'D'+String(state.dealers.length+1).padStart(4,'0'),name,tier,margin,balance,phone,email,address});
+    toast('Dealer created');
+  }
+  save();closeModal();showPage('dealers');
+}
+
+function dealerStatement(name){
+  const d=state.dealers.find(x=>x.name===name);
+  printHtml(`Dealer Statement - ${name}`,`<div class="head"><div><h1>${esc(state.settings.business)}</h1><div class="small">${esc(state.settings.address)}</div></div><div><h1>DEALER STATEMENT</h1></div></div><p><b>Dealer:</b> ${esc(name)}<br><b>Tier:</b> ${esc(d?.tier)} | <b>Profit Margin Rate:</b> ${d?.margin}%</p><table><thead><tr><th>Date</th><th>Description</th><th class="right">Debit</th><th class="right">Credit</th></tr></thead><tbody><tr><td>${today()}</td><td>Current Outstanding Ledger Balance</td><td class="right">${money(d?.balance||0)}</td><td class="right">${money(0)}</td></tr></tbody></table><h2 class="right">Total Balance Due: ${money(d?.balance||0)}</h2>`);
+}
+
+function pageQuotes(){
+  return listPage('Quotes','quote',state.quotes,
+    ['No','Customer','Date','Valid Until','Status','Total','Actions'],
+    q=>[q.no,q.customer,q.date,q.valid,statusBadge(q.status),money(q.total),`<button class="btn" onclick='printQuote(${JSON.stringify(q).replace(/'/g,"&#39;")})'>Print</button> <button class="btn" onclick="quoteToOrder(${q.id})">Convert to Order</button>`],
+    ()=>openDocForm('quote')
+  );
+}
+function pageOrders(){
+  return listPage('Sales Orders','order',state.orders,
+    ['No','Customer','Date','Status','Total','Actions'],
+    o=>[o.no,o.customer,o.date,statusBadge(o.status),money(o.total),`<button class="btn" onclick="orderToInvoice(${o.id})">Invoice</button> <button class="btn" onclick="printOrder(${o.id})">Print</button>`],
+    ()=>openDocForm('order')
+  );
+}
+function pageInvoices(){
+  return listPage('Invoices','invoice',state.invoices,
+    ['No','Customer','Date','Due','Status','Total','Balance','Actions'],
+    i=>[i.no,i.customer,i.date,i.due,statusBadge(i.status),money(i.total),money(totalInvoiceBalance(i)),`<button class="btn" onclick="payInvoice(${i.id})">Pay</button> <button class="btn" onclick="printInvoiceById(${i.id})">Print</button>`],
+    ()=>openDocForm('invoice')
+  );
+}
+function listPage(title,type,data,headers,rowFn,newFn){
+  return `<div class="card"><div class="card-head"><div><b>${title}</b><div class="small muted">${data.length} records</div></div><div class="toolbar"><input class="input" style="max-width:260px" placeholder="Search ${title.toLowerCase()}..." oninput="filterTable(this,'${type}Table')"><button class="btn primary" onclick="(${newFn.toString()})()">＋ New ${title.slice(0,-1)}</button></div></div><div class="table-wrap"><table id="${type}Table"><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${data.map(d=>`<tr>${rowFn(d).map((x,i)=>`<td data-col="${i}">${x}</td>`).join('')}</tr>`).join('')||`<tr><td colspan="${headers.length}" class="empty">No records.</td></tr>`}</tbody></table></div></div>`;
+}
+function filterTable(inp,id){const q=inp.value.toLowerCase();document.querySelectorAll('#'+id+' tbody tr').forEach(tr=>tr.style.display=tr.innerText.toLowerCase().includes(q)?'':'none')}
+function openDocForm(type){
+  const title=type==='quote'?'New Quote':type==='order'?'New Sales Order':'New Invoice';
+  const custOpts=[...state.customers.map(c=>c.name),...state.dealers.map(d=>d.name+' (Dealer)')];
+  const itemOpts=state.items.map(i=>({id:i.id,name:i.name}));
+  openModal(title,`<form id="docForm"><div class="form-grid">
+    ${selectField('Customer / Dealer','customer',custOpts,state.customers[0]?.name)}
+    ${htmlField(type==='quote'?'Valid Until':'Due Date','date',type==='quote'?'':today(),'date')}
+    <div class="col12"><label class="label">Line 1</label><div class="form-grid"><div class="col6"><select class="select" name="item1">${itemOpts.map(i=>`<option value="${i.id}">${esc(i.name)}</option>`).join('')}</select></div><div class="col3"><input class="input" name="qty1" type="number" min="1" step="1" value="1"></div><div class="col3"><input class="input" name="price1" type="number" min="0" step="0.001" value="${state.items[0]?.price||0}"></div></div></div>
+    <div class="col12"><label class="label">Line 2 (optional)</label><div class="form-grid"><div class="col6"><select class="select" name="item2"><option value="">—</option>${itemOpts.map(i=>`<option value="${i.id}">${esc(i.name)}</option>`).join('')}</select></div><div class="col3"><input class="input" name="qty2" type="number" min="1" step="1" value="1"></div><div class="col3"><input class="input" name="price2" type="number" min="0" step="0.001" value="0"></div></div></div>
+    ${htmlField('Notes','notes','')}
+  </div></form>`, `<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveDoc('${type}')">Save</button>`);
+}
+function saveDoc(type){
+  const fd=new FormData(document.getElementById('docForm')), customer=fd.get('customer');
+  const lines=[];['1','2'].forEach(n=>{const id=fd.get('item'+n);if(id){const it=state.items.find(x=>String(x.id)===String(id));const qty=num(fd.get('qty'+n));const price=num(fd.get('price'+n));if(it&&qty>0)lines.push({itemId:it.id,name:it.name,qty,price})}});
+  if(!lines.length)return toast('Add at least one line item');
+  const subtotal=sum(lines,x=>x.qty*x.price),tax=subtotal*state.settings.tax,total=subtotal+tax;
+  const obj={id:uid(),no:nextNo(type),customer,date:today(),status:type==='invoice'?'Unpaid':'Pending',subtotal,tax,total,lines,notes:fd.get('notes')||''};
+  if(type==='quote'){obj.valid=fd.get('date')||today();state.quotes.unshift(obj);log(`Quote ${obj.no} created`)}
+  if(type==='order'){obj.source='Manual';state.orders.unshift(obj);log(`Sales order ${obj.no} created`)}
+  if(type==='invoice'){obj.due=fd.get('date')||today();obj.paid=0;obj.method='Unpaid';state.invoices.unshift(obj);log(`Invoice ${obj.no} created`)}
+  save();closeModal();toast(`${type} saved`);showPage(type==='quote'?'quotes':type==='order'?'orders':'invoices');
+}
+function quoteToOrder(id){
+  const q=state.quotes.find(x=>x.id===id);if(!q)return;
+  const o={id:uid(),no:nextNo('order'),customer:q.customer,date:today(),status:'Confirmed',subtotal:q.subtotal,tax:q.tax,total:q.total,source:q.no,lines:q.lines};
+  state.orders.unshift(o);q.status='Accepted';save();log(`Quote ${q.no} converted to ${o.no}`);toast('Converted to sales order');showPage('orders');
+}
+function orderToInvoice(id){
+  const o=state.orders.find(x=>x.id===id);if(!o)return;
+  const i={id:uid(),no:nextNo('invoice'),customer:o.customer,date:today(),due:today(),status:'Unpaid',subtotal:o.subtotal,tax:o.tax,total:o.total,paid:0,method:'Unpaid',lines:o.lines};
+  state.invoices.unshift(i);o.status='Invoiced';save();log(`Order ${o.no} converted to ${i.no}`);toast('Invoice created');showPage('invoices');
+}
+function printInvoiceById(id){const i=state.invoices.find(x=>x.id===id);if(i)printInvoice(i)}
+function printOrder(id){const o=state.orders.find(x=>x.id===id);if(!o)return;printHtml(o.no,`<div class="head"><div><h1>${esc(state.settings.business)}</h1></div><div><h1>SALES ORDER</h1><div class="small">No: ${esc(o.no)}<br>Date: ${esc(o.date)}</div></div></div><p>Customer: <b>${esc(o.customer)}</b></p>${docLinesTable(o.lines)}<h2 class="right">Total: ${money(o.total)}</h2>`)}
+function payInvoice(id){
+  const i=state.invoices.find(x=>x.id===id);if(!i)return;
+  openModal(`Receive Payment — ${i.no}`,`<form id="payForm"><div class="form-grid">${htmlField('Invoice','invoice',i.no)}${htmlField('Customer','customer',i.customer)}${htmlField('Amount','amount',totalInvoiceBalance(i),'number','step="0.001" max="'+totalInvoiceBalance(i)+'"')}${selectField('Method','method',['Cash','Card','Bank Transfer','Cheque'])}${htmlField('Reference','reference','')}${htmlField('Date','date',today(),'date')}</div></form>`,`<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="savePayment(${id})">Apply Payment</button>`);
+}
+function savePayment(id){
+  const fd=new FormData(document.getElementById('payForm')),i=state.invoices.find(x=>x.id===id),amt=num(fd.get('amount'));
+  if(!i||amt<=0)return toast('Enter a valid amount');
+  const bal=totalInvoiceBalance(i);if(amt>bal+0.0001)return toast('Payment exceeds balance');
+  i.paid+=amt;i.status=(i.paid>=i.total-0.0001)?'Paid':'Partially Paid';i.method=fd.get('method');
+  state.payments.unshift({id:uid(),receipt:nextNo('receipt'),invoice:i.no,customer:i.customer,date:fd.get('date')||today(),amount:amt,method:fd.get('method'),reference:fd.get('reference')||'',notes:''});
+  log(`Payment ${money(amt)} received for ${i.no}`);save();closeModal();toast('Payment applied');showPage('payments');
+}
+function pagePayments(){
+  return `<div class="card"><div class="card-head"><div><b>Payments & Receipts</b><div class="small muted">${state.payments.length} receipts</div></div><div class="toolbar"><button class="btn primary" onclick="openQuickPayment()">＋ Receive Payment</button><button class="btn" onclick="showPage('invoices')">Outstanding Invoices</button></div></div><div class="table-wrap"><table><thead><tr><th>Receipt</th><th>Invoice</th><th>Customer</th><th>Date</th><th>Method</th><th>Amount</th><th>Reference</th></tr></thead><tbody>${state.payments.map(p=>`<tr><td>${esc(p.receipt)}</td><td>${esc(p.invoice)}</td><td>${esc(p.customer)}</td><td>${p.date}</td><td>${esc(p.method)}</td><td><b>${money(p.amount)}</b></td><td>${esc(p.reference||'')}</td></tr>`).join('')||'<tr><td colspan="7" class="empty">No payments recorded.</td></tr>'}</tbody></table></div></div>`;
+}
+function openQuickPayment(){
+  const inv=state.invoices.find(i=>totalInvoiceBalance(i)>0);if(inv)return payInvoice(inv.id);
+  toast('No outstanding invoices');
+}
+function pageRecurring(){
+  return `<div class="grid grid2">
+    ${recurringCard('Recurring Invoices','recurringInvoices','invoice')}
+    ${recurringCard('Recurring Orders','recurringOrders','order')}
+  </div>`;
+}
+function recurringCard(title,key,type){
+  const arr=state[key];
+  return `<div class="card"><div class="card-head"><b>${title}</b><button class="btn primary" onclick="openRecurring('${key}','${type}')">＋ Schedule</button></div><div class="card-body">${arr.map(r=>`<div class="list-row"><div><b>${esc(r.name)}</b><div class="small muted">${esc(r.customer)} · ${esc(r.frequency)} · Next ${esc(r.next)}</div></div><div>${statusBadge(r.status)}</div></div>`).join('')||'<div class="empty">No recurring schedules.</div>'}</div></div>`;
+}
+function openRecurring(key,type){
+  openModal(`New Recurring ${type==='invoice'?'Invoice':'Order'}`,`<form id="recForm"><div class="form-grid">${htmlField('Schedule Name','name','Monthly Service')}${selectField('Customer','customer',state.customers.map(c=>c.name),state.customers[0]?.name)}${selectField('Frequency','frequency',['Weekly','Monthly','Quarterly','Yearly'],'Monthly')}${htmlField('Next Run','next',today(),'date')}</div></form>`,`<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveRecurring('${key}')">Save Schedule</button>`);
+}
+function saveRecurring(key){
+  const fd=new FormData(document.getElementById('recForm'));state[key].push({id:uid(),name:fd.get('name'),customer:fd.get('customer'),frequency:fd.get('frequency'),next:fd.get('next'),status:'Scheduled'});save();closeModal();toast('Recurring schedule saved');renderContent();
+}
+
+function pageCustomers(){
+  return `<div class="card"><div class="card-head"><div><b>Customers & CRM</b><div class="small muted">${state.customers.length} customers</div></div><div class="toolbar"><input class="input" placeholder="Search customers..." oninput="filterTable(this,'custTable')"><button class="btn primary" onclick="openEntity('customer')">＋ New Customer</button></div></div><div class="table-wrap"><table id="custTable"><thead><tr><th>Code</th><th>Name</th><th>Phone</th><th>Group</th><th>Credit Limit</th><th>Balance</th><th>Actions</th></tr></thead><tbody>${state.customers.map(c=>`<tr><td>${esc(c.code)}</td><td><b>${esc(c.name)}</b><div class="small muted">${esc(c.email||'')}</div></td><td>${esc(c.phone)}</td><td>${esc(c.group)}</td><td>${money(c.credit)}</td><td>${money(customerBalance(c.name))}</td><td><button class="btn" onclick="customerStatement('${esc(c.name).replace(/'/g,"\\'")}')">Statement</button></td></tr>`).join('')}</tbody></table></div></div>`;
+}
+function customerBalance(name){return sum(state.invoices.filter(i=>i.customer===name),totalInvoiceBalance)}
+function customerStatement(name){
+  const inv=state.invoices.filter(i=>i.customer===name),pay=state.payments.filter(p=>p.customer===name);
+  const rows=inv.map(i=>`<tr><td>${i.date}</td><td>${i.no}</td><td>Invoice</td><td class="right">${money(i.total)}</td><td class="right">${money(0)}</td></tr>`).join('')+pay.map(p=>`<tr><td>${p.date}</td><td>${p.receipt}</td><td>Payment</td><td class="right">${money(0)}</td><td class="right">${money(p.amount)}</td></tr>`).join('');
+  printHtml(`${name} Statement`,`<div class="head"><div><h1>${esc(state.settings.business)}</h1><div class="small">${esc(state.settings.address)}</div></div><div><h1>CUSTOMER STATEMENT</h1></div></div><p><b>${esc(name)}</b></p><table><thead><tr><th>Date</th><th>Reference</th><th>Type</th><th class="right">Debit</th><th class="right">Credit</th></tr></thead><tbody>${rows}</tbody></table><h2 class="right">Balance: ${money(customerBalance(name))}</h2>`);
+}
+function openEntity(type){
+  const customer=type==='customer';
+  const title=customer?'New Customer':'New Supplier';
+  openModal(title,`<form id="entityForm"><div class="form-grid">${htmlField('Name','name','')}${htmlField('Phone','phone','')}${htmlField('Email','email','')}${htmlField(customer?'Credit Limit':'Opening Balance','amount','0','number','step="0.001"')}${htmlField('Group','group',customer?'Retail':'General')}${htmlField('Address','address','')}</div></form>`,`<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveEntity('${type}')">Save</button>`);
+}
+function saveEntity(type){
+  const fd=new FormData(document.getElementById('entityForm')),name=(fd.get('name')||'').trim();if(!name)return toast('Name required');
+  if(type==='customer')state.customers.push({id:uid(),code:'C'+String(state.customers.length+1).padStart(4,'0'),name,phone:fd.get('phone'),email:fd.get('email'),group:fd.get('group'),credit:num(fd.get('amount')),balance:0,address:fd.get('address'),salesperson:'Admin'});
+  else state.suppliers.push({id:uid(),code:'S'+String(state.suppliers.length+1).padStart(4,'0'),name,phone:fd.get('phone'),email:fd.get('email'),balance:num(fd.get('amount')),address:fd.get('address')});
+  save();closeModal();toast(`${type} saved`);showPage(type==='customer'?'customers':'suppliers');
+}
+function pageSuppliers(){
+  return `<div class="card"><div class="card-head"><div><b>Suppliers</b><div class="small muted">${state.suppliers.length} suppliers</div></div><button class="btn primary" onclick="openEntity('supplier')">＋ New Supplier</button></div><div class="table-wrap"><table><thead><tr><th>Code</th><th>Name</th><th>Phone</th><th>Balance</th><th>Address</th></tr></thead><tbody>${state.suppliers.map(s=>`<tr><td>${esc(s.code)}</td><td><b>${esc(s.name)}</b></td><td>${esc(s.phone)}</td><td>${money(s.balance)}</td><td>${esc(s.address||'')}</td></tr>`).join('')||'<tr><td colspan="5" class="empty">No suppliers.</td></tr>'}</tbody></table></div></div>`;
+}
+function pageInventory(){
+  return `<div class="card"><div class="card-head"><div><b>Items / Inventory</b><div class="small muted">${state.items.length} items · quantity and valuation</div></div><div class="toolbar"><input class="input" placeholder="Search item / SKU / barcode..." oninput="filterTable(this,'itemTable')"><button class="btn" onclick="openEntity('item')">＋ New Item</button><button class="btn" onclick="showPage('stock')">Stock Ops</button></div></div><div class="table-wrap"><table id="itemTable"><thead><tr><th>SKU</th><th>Item</th><th>Category</th><th>Location</th><th>Cost</th><th>Sale Price</th><th>Stock</th><th>Value</th><th>Actions</th></tr></thead><tbody>${state.items.map(i=>`<tr><td>${esc(i.sku)}</td><td><b>${esc(i.name)}</b><div class="small muted">${esc(i.barcode||'')}</div></td><td>${esc(i.category)}</td><td>${esc(i.location)}</td><td>${money(i.cost)}</td><td>${money(i.price)}</td><td>${i.stock<=i.reorder?'<span class="badge b-bad">'+i.stock+'</span>':'<span class="badge b-good">'+i.stock+'</span>'}</td><td>${money(i.stock*i.cost)}</td><td><button class="btn" onclick="editItem(${i.id})">Edit</button></td></tr>`).join('')}</tbody></table></div></div>`;
+}
+function openNewItem(){openEntity('item')}
+function editItem(id){
+  const i=state.items.find(x=>x.id===id);if(!i)return;
+  openModal('Edit Item',`<form id="itemForm"><div class="form-grid">${htmlField('SKU','sku',i.sku)}${htmlField('Name','name',i.name)}${selectField('Category','category',state.categories.map(c=>c.name),i.category)}${selectField('Location','location',state.locations.map(l=>l.name),i.location)}${htmlField('Cost','cost',i.cost,'number','step="0.001"')}${htmlField('Sale Price','price',i.price,'number','step="0.001"')}${htmlField('Stock','stock',i.stock,'number','step="1"')}${htmlField('Reorder Level','reorder',i.reorder,'number','step="1"')}${htmlField('Barcode','barcode',i.barcode)}</div></form>`,`<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveItem(${id})">Save</button>`);
+}
+function saveItem(id){
+  const fd=new FormData(document.getElementById('itemForm')),i=state.items.find(x=>x.id===id);if(!i)return;
+  ['sku','name','category','location','barcode'].forEach(k=>i[k]=fd.get(k));['cost','price','stock','reorder'].forEach(k=>i[k]=num(fd.get(k)));
+  save();closeModal();toast('Item updated');showPage('inventory');
+}
+function openItemCreate(){
+  openModal('New Item',`<form id="itemForm"><div class="form-grid">${htmlField('SKU','sku','SKU-'+uid().toString().slice(-5))}${htmlField('Name','name','')}${selectField('Category','category',state.categories.map(c=>c.name),state.categories[0]?.name)}${selectField('Location','location',state.locations.map(l=>l.name),state.locations[0]?.name)}${htmlField('Cost','cost',0,'number','step="0.001"')}${htmlField('Sale Price','price',0,'number','step="0.001"')}${htmlField('Stock','stock',0,'number')}${htmlField('Reorder Level','reorder',5,'number')}${htmlField('Barcode','barcode','')}</div></form>`,`<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="createItem()">Save</button>`);
+}
+function createItem(){const fd=new FormData(document.getElementById('itemForm')),name=(fd.get('name')||'').trim();if(!name)return toast('Item name required');state.items.unshift({id:uid(),sku:fd.get('sku'),name,category:fd.get('category'),location:fd.get('location'),cost:num(fd.get('cost')),price:num(fd.get('price')),stock:num(fd.get('stock')),reorder:num(fd.get('reorder')),barcode:fd.get('barcode'),serialTrack:false,unit:'pcs',taxable:true});save();closeModal();toast('Item added');showPage('inventory')}
+function pageStock(){
+  return `<div class="grid grid3">
+    <div class="card"><div class="card-head"><b>Receive Stock</b></div><div class="card-body"><form id="recvForm"><div class="form-grid">${selectField('Item','item',state.items.map(i=>i.name),state.items[0]?.name)}${htmlField('Quantity','qty',1,'number','step="1" min="1"')}${selectField('Location','location',state.locations.map(l=>l.name),state.locations[0]?.name)}${htmlField('Reference','ref','')}</div><button class="btn primary" style="margin-top:12px" onclick="receiveStock(event)">Receive</button></form></div></div>
+    <div class="card"><div class="card-head"><b>Stock Transfer</b></div><div class="card-body"><form id="transForm"><div class="form-grid">${selectField('Item','item',state.items.map(i=>i.name),state.items[0]?.name)}${htmlField('Quantity','qty',1,'number','min="1"')}${selectField('From','from',state.locations.map(l=>l.name),state.locations[0]?.name)}${selectField('To','to',state.locations.map(l=>l.name),state.locations[1]?.name||state.locations[0]?.name)}</div><button class="btn primary" style="margin-top:12px" onclick="transferStock(event)">Transfer</button></form></div></div>
+    <div class="card"><div class="card-head"><b>Return to Supplier</b></div><div class="card-body"><form id="retForm"><div class="form-grid">${selectField('Item','item',state.items.map(i=>i.name),state.items[0]?.name)}${htmlField('Quantity','qty',1,'number','min="1"')}${htmlField('Supplier','supplier',state.suppliers[0]?.name||'')}${htmlField('Reference','ref','')}</div><button class="btn bad" style="margin-top:12px" onclick="returnStock(event)">Return Stock</button></form></div></div>
+  </div>
+  <div style="height:16px"></div><div class="card"><div class="card-head"><b>Recent Stock Transfers</b></div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Item</th><th>Qty</th><th>From</th><th>To</th><th>Reference</th></tr></thead><tbody>${state.transfers.map(t=>`<tr><td>${t.date}</td><td>${esc(t.item)}</td><td>${t.qty}</td><td>${esc(t.from)}</td><td>${esc(t.to)}</td><td>${esc(t.ref||'')}</td></tr>`).join('')||'<tr><td colspan="6" class="empty">No transfers recorded.</td></tr>'}</tbody></table></div></div>`;
+}
+function receiveStock(e){e.preventDefault();const fd=new FormData(e.target),name=fd.get('item'),it=state.items.find(x=>x.name===name),q=num(fd.get('qty'));if(!it||q<=0)return;it.stock+=q;log(`Received ${q} ${it.unit} of ${it.name}`);save();toast('Stock received');showPage('stock')}
+function transferStock(e){e.preventDefault();const fd=new FormData(e.target),name=fd.get('item'),it=state.items.find(x=>x.name===name),q=num(fd.get('qty'));if(!it||q<=0)return;if(it.stock<q)return toast('Insufficient stock');it.stock-=q;state.transfers.unshift({id:uid(),date:today(),item:it.name,qty:q,from:fd.get('from'),to:fd.get('to'),ref:''});log(`Transferred ${q} of ${it.name}`);save();toast('Transfer recorded');showPage('stock')}
+function returnStock(e){e.preventDefault();const fd=new FormData(e.target),name=fd.get('item'),it=state.items.find(x=>x.name===name),q=num(fd.get('qty'));if(!it||q<=0)return;if(it.stock<q)return toast('Insufficient stock');it.stock-=q;log(`Returned ${q} of ${it.name} to supplier`);save();toast('Return recorded');showPage('stock')}
+
+function pageCredit(){
+  return `<div class="grid grid2">
+    <div class="card"><div class="card-head"><b>Credit Notes</b><button class="btn primary" onclick="openCredit()">＋ New Credit Note</button></div><div class="table-wrap"><table><thead><tr><th>No</th><th>Customer</th><th>Date</th><th>Invoice</th><th>Total</th><th>Status</th></tr></thead><tbody>${state.creditNotes.map(c=>`<tr><td>${esc(c.no)}</td><td>${esc(c.customer)}</td><td>${c.date}</td><td>${esc(c.invoice)}</td><td>${money(c.total)}</td><td>${statusBadge(c.status)}</td></tr>`).join('')||'<tr><td colspan="6" class="empty">No credit notes.</td></tr>'}</tbody></table></div></div>
+    <div class="card"><div class="card-head"><b>Refunds & Returns</b></div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Invoice</th><th>Customer</th><th>Amount</th><th>Method</th></tr></thead><tbody>${state.refunds.map(r=>`<tr><td>${r.date}</td><td>${esc(r.invoice)}</td><td>${esc(r.customer)}</td><td>${money(r.amount)}</td><td>${esc(r.method)}</td></tr>`).join('')||'<tr><td colspan="5" class="empty">No refunds.</td></tr>'}</tbody></table></div></div>
+  </div>`;
+}
+function openCredit(){
+  const inv=state.invoices[0];openModal('New Credit Note',`<form id="cnForm"><div class="form-grid">${htmlField('Invoice','invoice',inv?.no||'')}${htmlField('Customer','customer',inv?.customer||'')}${htmlField('Amount','amount',0,'number','step="0.001"')}${htmlField('Reason','reason','')}</div></form>`,`<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveCredit()">Save</button>`);
+}
+function saveCredit(){const fd=new FormData(document.getElementById('cnForm')),amt=num(fd.get('amount'));if(amt<=0)return toast('Enter amount');state.creditNotes.unshift({id:uid(),no:nextNo('credit'),invoice:fd.get('invoice'),customer:fd.get('customer'),date:today(),total:amt,status:'Completed',reason:fd.get('reason')});save();closeModal();toast('Credit note saved');showPage('credit')}
+
+function pageReports(){
+  const sales=sum(state.invoices,i=>i.total), paid=sum(state.invoices,i=>i.paid), due=sales-paid, expenses=sum(state.expenses,e=>e.amount), gross=sum(state.invoices,i=>i.subtotal)-sum(state.invoices,i=>{const totalCost=sum(i.lines,l=>{const it=state.items.find(x=>x.id===l.itemId);return (it?it.cost:0)*l.qty});return totalCost});
+  return `<div class="grid grid4">${statCard('Sales',money(sales),'Invoice total','◒')}${statCard('Collected',money(paid),'Paid','◉')}${statCard('Receivables',money(due),'Outstanding','!')}${statCard('Expenses',money(expenses),'Recorded expenses','−')}</div>
+  <div style="height:16px"></div><div class="grid grid2">
+    <div class="card"><div class="card-head"><b>Accounts Receivable Aging</b><button class="btn" onclick="printAR()">Print</button></div><div class="table-wrap"><table><thead><tr><th>Customer / Dealer</th><th>Current</th><th>1–30</th><th>31–60</th><th>61+</th><th>Total</th></tr></thead><tbody>${agingRows()}</tbody></table></div></div>
+    <div class="card"><div class="card-head"><b>Sales by Customer / Dealer</b><button class="btn" onclick="printCustomerSales()">Print</button></div><div class="table-wrap"><table><thead><tr><th>Customer</th><th>Invoices</th><th>Sales</th><th>Paid</th><th>Balance</th></tr></thead><tbody>${state.customers.map(c=>{const inv=state.invoices.filter(i=>i.customer===c.name);return `<tr><td>${esc(c.name)}</td><td>${inv.length}</td><td>${money(sum(inv,i=>i.total))}</td><td>${money(sum(inv,i=>i.paid))}</td><td>${money(sum(inv,totalInvoiceBalance))}</td></tr>`}).join('')}</tbody></table></div></div>
+  </div><div style="height:16px"></div><div class="grid grid2">
+    <div class="card"><div class="card-head"><b>Inventory Valuation</b></div><div class="table-wrap"><table><thead><tr><th>Category</th><th>Qty</th><th>Value</th></tr></thead><tbody>${state.categories.map(c=>{const arr=state.items.filter(i=>i.category===c.name);return `<tr><td>${esc(c.name)}</td><td>${sum(arr,i=>i.stock)}</td><td>${money(sum(arr,i=>i.stock*i.cost))}</td></tr>`}).join('')}</tbody></table></div></div>
+    <div class="card"><div class="card-head"><b>Payment Methods</b></div><div class="table-wrap"><table><thead><tr><th>Method</th><th>Transactions</th><th>Amount</th></tr></thead><tbody>${['Cash','Card','Bank Transfer','Cheque','Credit'].map(m=>{const arr=state.payments.filter(p=>p.method===m);return `<tr><td>${m}</td><td>${arr.length}</td><td>${money(sum(arr,x=>x.amount))}</td></tr>`}).join('')}</tbody></table></div></div>
+  </div>`;
+}
+function agingRows(){
+  const now=new Date();
+  return state.customers.map(c=>{
+    let cur=0,a30=0,a60=0,a61=0;
+    state.invoices.filter(i=>i.customer===c.name&&totalInvoiceBalance(i)>0).forEach(i=>{const d=Math.max(0,Math.floor((now-new Date(i.due))/86400000));const b=totalInvoiceBalance(i);if(d<=0)cur+=b;else if(d<=30)a30+=b;else if(d<=60)a60+=b;else a61+=b});
+    const total=cur+a30+a60+a61;if(!total)return '';return `<tr><td>${esc(c.name)}</td><td>${money(cur)}</td><td>${money(a30)}</td><td>${money(a60)}</td><td>${money(a61)}</td><td><b>${money(total)}</b></td></tr>`;
+  }).join('')||'<tr><td colspan="6" class="empty">No receivables.</td></tr>';
+}
+function printAR(){printHtml('Accounts Receivable Aging',`<h1>${esc(state.settings.business)}</h1><h2>Accounts Receivable Aging</h2><table><thead><tr><th>Customer</th><th>Current</th><th>1-30</th><th>31-60</th><th>61+</th><th>Total</th></tr></thead><tbody>${agingRows()}</tbody></table>`)}
+function printCustomerSales(){printHtml('Customer Sales',`<h1>${esc(state.settings.business)}</h1><h2>Sales by Customer</h2><table><thead><tr><th>Customer</th><th>Invoices</th><th>Sales</th><th>Paid</th><th>Balance</th></tr></thead><tbody>${state.customers.map(c=>{const inv=state.invoices.filter(i=>i.customer===c.name);return `<tr><td>${esc(c.name)}</td><td>${inv.length}</td><td>${money(sum(inv,i=>i.total))}</td><td>${money(sum(inv,i=>i.paid))}</td><td>${money(sum(inv,totalInvoiceBalance))}</td></tr>`}).join('')}</tbody></table>`)}
+
+function pageUsers(){
+  return `<div class="grid grid2">
+    <div class="card"><div class="card-head"><b>User Accounts</b><button class="btn primary" onclick="openUser()">＋ Add User</button></div><div class="table-wrap"><table><thead><tr><th>Name</th><th>Username</th><th>Role</th><th>Active</th><th>Actions</th></tr></thead><tbody>${state.users.map(u=>`<tr><td>${esc(u.name)}</td><td>${esc(u.username)}</td><td>${esc(u.role)}</td><td>${u.active?statusBadge('Active'):statusBadge('Cancelled')}</td><td><button class="btn" onclick="toggleUser(${u.id})">Toggle</button></td></tr>`).join('')}</tbody></table></div></div>
+    <div class="card"><div class="card-head"><b>Salespeople</b><button class="btn primary" onclick="openSalesperson()">＋ Add</button></div><div class="card-body">${state.salespeople.map(s=>`<div class="list-row"><b>${esc(s.name)}</b><span class="small muted">Salesperson</span></div>`).join('')}</div></div>
+  </div>`;
+}
+function openUser(){openModal('Add User',`<form id="uForm"><div class="form-grid">${htmlField('Name','name','')}${htmlField('Username','username','')}${htmlField('Password','password','admin')}${selectField('Role','role',['Administrator','Manager','Cashier','Sales','Viewer'],'Cashier')}</div></form>`,`<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveUser()">Save</button>`)}
+function saveUser(){const fd=new FormData(document.getElementById('uForm'));state.users.push({id:uid(),name:fd.get('name'),username:fd.get('username'),role:fd.get('role'),active:true});save();closeModal();showPage('users')}
+function toggleUser(id){const u=state.users.find(x=>x.id===id);if(u){u.active=!u.active;save();renderContent()}}
+function openSalesperson(){openModal('New Salesperson',`<form id="spForm">${htmlField('Name','name','')}</form>`,`<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveSP()">Save</button>`)}
+function saveSP(){const fd=new FormData(document.getElementById('spForm'));if(fd.get('name'))state.salespeople.push({id:uid(),name:fd.get('name')});save();closeModal();showPage('users')}
+
+function pageImport(){
+  return `<div class="grid grid2"><div class="card"><div class="card-head"><b>CSV Import Wizard — Step 1</b></div><div class="card-body"><div class="notice">Import items or customers from CSV. UTF-8 CSV is recommended. Your file stays in this browser.</div><div style="height:12px"></div><input type="file" id="csvFile" accept=".csv,text/csv" class="input"><div class="toolbar" style="margin-top:12px"><select id="csvType" class="select"><option value="items">Items</option><option value="customers">Customers</option><option value="suppliers">Suppliers</option><option value="dealers">Dealers</option></select><button class="btn primary" onclick="readCSV()">Load CSV</button></div></div></div>
+  <div class="card"><div class="card-head"><b>Step 2–3 — Match & Import</b></div><div class="card-body"><div id="csvPreview" class="empty">Select a CSV file to preview columns and import.</div></div></div></div>`;
+}
+let csvRows=[];
+function parseCSV(text){
+  const lines=text.replace(/^\uFEFF/,'').split(/\r?\n/).filter(x=>x.trim());
+  if(!lines.length)return [];
+  return lines.map(line=>{
+    const out=[];let cur='',q=false;
+    for(let i=0;i<line.length;i++){const ch=line[i];if(ch==='"'){if(q&&line[i+1]==='"'){cur+='"';i++}else q=!q}else if(ch===','&&!q){out.push(cur);cur=''}else cur+=ch}
+    out.push(cur);return out;
+  });
+}
+function readCSV(){
+  const f=document.getElementById('csvFile')?.files?.[0];if(!f)return toast('Select CSV file');
+  const type=document.getElementById('csvType').value;const r=new FileReader();
+  r.onload=()=>{const rows=parseCSV(r.result);csvRows=rows;const head=rows[0]||[];const sample=rows.slice(1,5);
+    document.getElementById('csvPreview').innerHTML=`<div class="small muted">Detected ${rows.length-1} data rows. Target: <b>${type}</b></div><div class="table-wrap" style="margin-top:10px"><table style="min-width:0"><thead><tr>${head.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${sample.map(row=>`<tr>${row.map(v=>`<td>${esc(v)}</td>`).join('')}</tr>`).join('')}</tbody></table></div><div class="toolbar" style="margin-top:12px"><button class="btn" onclick="downloadTemplate('${type}')">Download Template</button><button class="btn primary" onclick="importCSV('${type}')">Import ${rows.length-1} Rows</button></div>`;
+  };r.readAsText(f);
+}
+function normalize(s){return String(s||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'_')}
+function importCSV(type){
+  if(!csvRows.length)return;const h=csvRows[0].map(normalize);
+  csvRows.slice(1).forEach(r=>{const o={};h.forEach((k,i)=>o[k]=r[i]||'');
+    if(type==='items')state.items.push({id:uid(),sku:o.sku||'CSV-'+uid().toString().slice(-5),name:o.name||o.item||'Imported Item',category:o.category||'Accessories',location:o.location||'Main Store',cost:num(o.cost),price:num(o.price||o.sale_price),stock:num(o.stock||o.quantity),reorder:num(o.reorder||5),barcode:o.barcode||'',serialTrack:false,unit:o.unit||'pcs',taxable:true});
+    if(type==='customers')state.customers.push({id:uid(),code:o.code||'C'+String(state.customers.length+1).padStart(4,'0'),name:o.name||'Imported Customer',phone:o.phone||'',email:o.email||'',group:o.group||'Retail',credit:num(o.credit_limit||o.credit),balance:num(o.balance),address:o.address||'',salesperson:o.salesperson||'Admin'});
+    if(type==='suppliers')state.suppliers.push({id:uid(),code:o.code||'S'+String(state.suppliers.length+1).padStart(4,'0'),name:o.name||'Imported Supplier',phone:o.phone||'',email:o.email||'',balance:num(o.balance),address:o.address||''});
+    if(type==='dealers')state.dealers.push({id:uid(),code:o.code||'D'+String(state.dealers.length+1).padStart(4,'0'),name:o.name||'Imported Dealer',phone:o.phone||'',email:o.email||'',tier:o.tier||'Tier 1 (Wholesale)',margin:num(o.margin||10),balance:num(o.balance),address:o.address||''});
+  });
+  save();toast(`${csvRows.length-1} rows imported`);csvRows=[];showPage(type==='items'?'inventory':type==='customers'?'customers':type==='suppliers'?'suppliers':'dealers');
+}
+function downloadTemplate(type){
+  const m={
+    items:'sku,name,category,location,cost,price,stock,reorder,barcode,unit\nSKU-001,Sample Item,Accessories,Main Store,10,15,5,2,123456,pcs\n',
+    customers:'code,name,phone,email,group,credit_limit,balance,address,salesperson\nC0001,Sample Customer,+968 90000000,,Retail,100,0,Muscat,Admin\n',
+    suppliers:'code,name,phone,email,balance,address\nS0001,Sample Supplier,+968 24000000,,0,Muscat\n',
+    dealers:'code,name,phone,email,tier,margin,balance,address\nD0001,Sample Dealer,+968 95550000,,Tier 1 (Wholesale),12.5,0,Ruwi\n'
+  };downloadFile(type+'_template.csv',m[type],'text/csv')}
+function pageBackup(){
+  return `<div class="grid grid2"><div class="card"><div class="card-head"><b>Backup Data</b></div><div class="card-body"><p class="small muted">Create a complete JSON backup of current browser data.</p><button class="btn primary" onclick="backupJSON()">Download Backup JSON</button></div></div>
+  <div class="card"><div class="card-head"><b>Restore Data</b></div><div class="card-body"><input type="file" class="input" id="restoreFile" accept=".json,application/json"><div style="height:10px"></div><button class="btn warn" onclick="restoreJSON()">Restore Backup</button><div class="notice warn" style="margin-top:12px">Restore replaces the current browser data. Make a backup first.</div></div></div></div>
+  <div style="height:16px"></div><div class="card"><div class="card-head"><b>Data Utilities</b></div><div class="card-body"><div class="toolbar"><button class="btn" onclick="clearLocalData()">Reset to Demo Data</button><button class="btn" onclick="window.localStorage.removeItem(KEY);toast('Local data key cleared');location.reload()">Delete Local Data</button></div></div></div>`;
+}
+function backupJSON(){downloadFile(`rst_erp_backup_${today()}.json`,JSON.stringify(state,null,2));toast('Backup downloaded')}
+function restoreJSON(){const f=document.getElementById('restoreFile')?.files?.[0];if(!f)return toast('Select a backup JSON');const r=new FileReader();r.onload=()=>{try{state=deepMerge(JSON.parse(r.result),defState);save();toast('Restore complete');location.reload()}catch(e){toast('Invalid backup')}};r.readAsText(f)}
+function clearLocalData(){state=JSON.parse(JSON.stringify(defState));save();toast('Reset complete');renderApp();}
+
+function pageSettings(){
+  const s=state.settings;
+  return `<div class="card"><div class="tabs" id="settingsTabs">${['Business','Logo','Regional','Currency','Tax','Payments','Inventory','Page Layout','Invoice','Invoice Template','Invoice Text','Quote','Order','Credit Note','Packing Slip','Receipt','Statements','Web Access','Email','Other'].map((x,i)=>`<button class="tab ${i===0?'active':''}" onclick="settingsTab(this,'${normalize(x)}')">${x}</button>`).join('')}</div>
+  <div class="card-body" id="settingsBody">${settingsPanel('business')}</div></div>`;
+}
+function settingsTab(btn,key){document.querySelectorAll('#settingsTabs .tab').forEach(x=>x.classList.remove('active'));btn.classList.add('active');document.getElementById('settingsBody').innerHTML=settingsPanel(key)}
+function settingsPanel(k){
+  const s=state.settings;
+  if(k==='business')return `<form id="setForm" onsubmit="saveSettings(event)"><div class="form-grid">${htmlField('Business Name','business',s.business)}${htmlField('Legal Name','legal',s.legal)}${htmlField('CR Number','cr',s.cr)}${htmlField('VAT Number','vat',s.vat)}${htmlField('Phone','phone',s.phone)}${htmlField('Email','email',s.email)}${htmlField('Address','address',s.address)}${selectField('Language','language',['en','bn','ar'],s.language)}</div><button class="btn primary" style="margin-top:12px">Save Business</button></form>`;
+  if(k==='logo')return `<div class="grid grid2"><div class="card"><div class="card-body"><div class="logo-xl" style="margin:0 0 10px">${esc((s.business||'RST').slice(0,3).toUpperCase())}</div><div class="small muted">Logo preview uses business name initials in this standalone edition.</div></div></div><div class="card"><div class="card-body"><label class="label">Brand Accent</label><input class="input" value="#4f46e5" id="brandColor"><button class="btn" style="margin-top:10px" onclick="setBrand()">Apply Color</button></div></div></div>`;
+  if(k==='regional')return `<form id="setForm" onsubmit="saveSettings(event)"><div class="form-grid">${selectField('Date Format','dateFormat',['DD/MM/YYYY','MM/DD/YYYY','YYYY-MM-DD'],s.dateFormat)}${htmlField('Decimal Places','decimals',s.decimals,'number','min="0" max="4"')}${selectField('Page Size','pageSize',['A4','A5','Letter'],s.pageSize)}</div><button class="btn primary" style="margin-top:12px">Save Regional</button></form>`;
+  if(k==='currency')return `<form id="setForm" onsubmit="saveSettings(event)"><div class="form-grid">${selectField('Base Currency','currency',['OMR','USD','EUR','AED','SAR','BHD','KWD','QAR','INR'],s.currency)}</div><div class="notice" style="margin-top:12px">Multi-currency is supported at document presentation level. Exchange-rate accounting tables can be added when a server database is connected.</div><button class="btn primary" style="margin-top:12px">Save Currency</button></form>`;
+  if(k==='tax')return `<form id="setForm" onsubmit="saveSettings(event)"><div class="form-grid">${htmlField('Tax Rate','tax',(s.tax*100).toFixed(2),'number','step="0.01"')}${htmlField('Invoice Prefix','invoicePrefix',s.invoicePrefix)}${htmlField('Quote Prefix','quotePrefix',s.quotePrefix)}${htmlField('Order Prefix','orderPrefix',s.orderPrefix)}${htmlField('Credit Note Prefix','creditPrefix',s.creditPrefix)}${htmlField('Receipt Prefix','receiptPrefix',s.receiptPrefix)}${htmlField('Dealer Prefix','dealerPrefix',s.dealerPrefix||'D-')}</div><div class="notice" style="margin-top:12px">Tax rate is entered as a percentage, e.g. 5 for 5%.</div><button class="btn primary" style="margin-top:12px">Save Tax</button></form>`;
+  if(k==='payments')return `<form id="setForm" onsubmit="saveSettings(event)"><div class="form-grid">${selectField('Default Method','defaultPay',['Cash','Card','Bank Transfer','Cheque','Credit'],'Cash')}${htmlField('Payment Terms (days)','termsDays',14,'number')}</div><div class="notice" style="margin-top:12px">Payment receipts are linked to invoices and update invoice balance/status automatically.</div><button class="btn primary" style="margin-top:12px">Save Payments</button></form>`;
+  if(k==='inventory')return `<form id="setForm" onsubmit="saveSettings(event)"><div class="form-grid">${htmlField('Low Stock Default','lowStock',s.lowStock,'number')}${selectField('Allow Negative Stock','negativeStock',['false','true'],String(s.negativeStock))}${selectField('Default Unit','unit',['pcs','set','box','meter','kg','service'],'pcs')}</div><button class="btn primary" style="margin-top:12px">Save Inventory</button></form>`;
+  if(k==='page_layout')return `<div class="notice good">A4-ready print styles are built into Quotes, Orders, Invoices, Statements and Reports.</div>`;
+  if(k==='invoice')return `<div class="grid grid2"><div class="card"><div class="card-body"><b>Invoice Options</b><p class="small muted">Auto numbering, VAT, balance, payment status and print layout are enabled.</p></div></div><div class="card"><div class="card-body"><b>Invoice Prefix</b><p>${esc(s.invoicePrefix)}</p></div></div></div>`;
+  if(k==='invoice_template')return `<div class="notice">Template engine: Header → Customer → Line Items → Subtotal → Tax → Total → Paid → Balance → Notes.</div>`;
+  if(k==='invoice_text')return `<form id="setForm" onsubmit="saveSettings(event)"><div><label class="label">Invoice Notes / Footer Text</label><textarea class="textarea" name="invoiceNotes" rows="5">${esc(s.invoiceNotes)}</textarea></div><button class="btn primary" style="margin-top:12px">Save Invoice Text</button></form>`;
+  if(k==='quote'||k==='order'||k==='credit_note'||k==='packing_slip'||k==='receipt'||k==='statements')return `<div class="notice">This section controls the corresponding document workflow. Create/convert/print actions are active from the main modules.</div>`;
+  if(k==='web_access')return `<form id="setForm" onsubmit="saveSettings(event)"><div class="form-grid">${selectField('Web Access','webAccess',['true','false'],String(s.webAccess))}${htmlField('Web Session Timeout (min)','timeout',30,'number')}</div><button class="btn primary" style="margin-top:12px">Save Web Access</button></form><div class="notice warn" style="margin-top:12px">This single-file edition does not expose your browser database to the internet. For real multi-device Web Access, use the PHP/MySQL build.</div>`;
+  if(k==='email')return `<form id="setForm" onsubmit="saveSettings(event)"><div class="form-grid">${selectField('Email Enabled','emailEnabled',['false','true'],String(s.emailEnabled))}${htmlField('SMTP Host','smtpHost','')} ${htmlField('SMTP Port','smtpPort','587','number')}</div><button class="btn primary" style="margin-top:12px">Save Email Settings</button></form>`;
+  return `<form id="setForm" onsubmit="saveSettings(event)"><div class="form-grid">${selectField('Backup Reminder','backupReminder',['true','false'],String(s.backupReminder))}${htmlField('Default Terms','defaultTerms',s.defaultTerms)}</div><button class="btn primary" style="margin-top:12px">Save Other</button></form>`;
+}
+function saveSettings(e){
+  e.preventDefault();const fd=new FormData(e.target);
+  for(const [k,v] of fd.entries()){
+    if(k==='tax')state.settings[k]=num(v)/100;else if(['decimals','lowStock','termsDays','timeout','smtpPort'].includes(k))state.settings[k]=num(v);else if(['negativeStock','webAccess','emailEnabled','backupReminder'].includes(k))state.settings[k]=v==='true';else state.settings[k]=v;
+  }
+  save();toast('Settings saved');renderContent();
+}
+function setBrand(){const c=document.getElementById('brandColor')?.value||'#4f46e5';document.documentElement.style.setProperty('--brand',c);toast('Accent updated for this session')}
+
+function pageTools(){
+  return `<div class="grid grid3">
+    <div class="card"><div class="card-head"><b>Application Integration</b></div><div class="card-body"><p class="small muted">Inventoria-style import/export is provided through CSV and JSON. A live LAN/API connector is intentionally not faked in this browser-only edition.</p><button class="btn" onclick="showPage('import')">CSV Import</button> <button class="btn" onclick="showPage('backup')">Backup</button></div></div>
+    <div class="card"><div class="card-head"><b>Multiple Businesses</b></div><div class="card-body"><p class="small muted">Use backup/restore to move between separate business datasets. The current business profile is stored in settings.</p><button class="btn" onclick="openBusinessProfile()">Edit Business</button></div></div>
+    <div class="card"><div class="card-head"><b>Mail Merge</b></div><div class="card-body"><p class="small muted">Create a printable customer contact sheet from the current CRM.</p><button class="btn" onclick="printMailMerge()">Print Customer List</button></div></div>
+    <div class="card"><div class="card-head"><b>Screen References</b></div><div class="card-body"><div class="list"><div class="list-row">Dealers & Margins <span>✓</span></div><div class="list-row">Telecom & Utility Bills <span>✓</span></div><div class="list-row">POS & Invoices <span>✓</span></div><div class="list-row">Reports & Statements <span>✓</span></div></div></div></div>
+    <div class="card"><div class="card-head"><b>Keyboard Shortcuts</b></div><div class="card-body"><div class="list"><div class="list-row"><span>Ctrl + K</span><span>Global Search</span></div><div class="list-row"><span>Alt + N</span><span>New Invoice</span></div><div class="list-row"><span>F2</span><span>POS</span></div><div class="list-row"><span>Esc</span><span>Close Modal</span></div></div></div></div>
+    <div class="card"><div class="card-head"><b>Data Health</b></div><div class="card-body"><div class="list">${[
+      ['Items',state.items.length],['Customers',state.customers.length],['Dealers',state.dealers.length],['Telecom Bills',state.telecomBills.length],['Utility Bills',state.utilityBills.length],['Invoices',state.invoices.length]
+    ].map(x=>`<div class="list-row"><b>${x[0]}</b><span>${x[1]}</span></div>`).join('')}</div></div></div>
+  </div>`;
+}
+function openBusinessProfile(){showPage('settings');toast('Open Business tab to edit profile')}
+function printMailMerge(){printHtml('Customer Contact List',`<h1>${esc(state.settings.business)}</h1><h2>Customer Contact List</h2><table><thead><tr><th>Code</th><th>Name</th><th>Phone</th><th>Email</th><th>Group</th><th>Address</th></tr></thead><tbody>${state.customers.map(c=>`<tr><td>${esc(c.code)}</td><td>${esc(c.name)}</td><td>${esc(c.phone)}</td><td>${esc(c.email||'')}</td><td>${esc(c.group)}</td><td>${esc(c.address||'')}</td></tr>`).join('')}</tbody></table>`)}
+
+function quickNew(type){
+  if(!type){openDocForm('invoice');return}
+  if(type==='quote')return openDocForm('quote');
+  if(type==='salesorder'||type==='salesorder')return openDocForm('order');
+  if(type==='invoice')return openDocForm('invoice');
+  if(type==='dealer')return openDealerForm();
+  if(type==='telecombill')return openTelecomModal();
+  if(type==='utilitybill')return openUtilityModal();
+  if(type==='customer')return openEntity('customer');
+  if(type==='item')return openItemCreate();
+}
+function globalSearch(q){
+  q=q.toLowerCase().trim();if(!q)return;
+  const hits=[];
+  state.customers.forEach(x=>`${x.name} ${x.phone}`.toLowerCase().includes(q)&&hits.push(`Customer: ${x.name}`));
+  state.dealers.forEach(x=>`${x.name} ${x.phone}`.toLowerCase().includes(q)&&hits.push(`Dealer: ${x.name} (${x.tier})`));
+  state.items.forEach(x=>`${x.name} ${x.sku} ${x.barcode}`.toLowerCase().includes(q)&&hits.push(`Item: ${x.name}`));
+  state.invoices.forEach(x=>`${x.no} ${x.customer}`.toLowerCase().includes(q)&&hits.push(`Invoice: ${x.no} · ${x.customer}`));
+  state.telecomBills.forEach(x=>`${x.ref} ${x.provider} ${x.accountNo}`.toLowerCase().includes(q)&&hits.push(`Telecom: ${x.provider} (${x.accountNo})`));
+  const box=document.getElementById('content');if(box&&hits.length)box.insertAdjacentHTML('afterbegin',`<div class="card" style="margin-bottom:12px"><div class="card-head"><b>Search Results</b><button class="btn" onclick="this.closest('.card').remove()">Close</button></div><div class="card-body"><div class="list">${hits.slice(0,12).map(h=>`<div class="list-row">${esc(h)}<span>•</span></div>`).join('')}</div></div></div>`);
+}
+function customerFromName(n){return state.customers.find(c=>c.name===n)}
+
+document.addEventListener('keydown',e=>{
+  if(e.ctrlKey&&e.key.toLowerCase()==='k'){e.preventDefault();document.getElementById('globalSearch')?.focus()}
+  if(e.altKey&&e.key.toLowerCase()==='n'){e.preventDefault();quickNew('invoice')}
+  if(e.key==='F2'){e.preventDefault();showPage('pos')}
+  if(e.key==='Escape'&&modalOpen)closeModal()
+});
+window.addEventListener('resize',()=>{if(window.innerWidth>=1100)document.getElementById('sidebar')?.classList.remove('open')});
+
+window.showPage=showPage;window.closeModal=closeModal;window.toggleSidebar=toggleSidebar;window.logout=logout;window.quickNew=quickNew;
+window.openDocForm=openDocForm;window.saveDoc=saveDoc;window.quoteToOrder=quoteToOrder;window.orderToInvoice=orderToInvoice;
+window.printInvoiceById=printInvoiceById;window.payInvoice=payInvoice;window.savePayment=savePayment;window.openQuickPayment=openQuickPayment;
+window.renderPOSProducts=renderPOSProducts;window.cartAdd=cartAdd;window.clearCart=clearCart;window.cartQty=cartQty;window.cartRemove=cartRemove;window.completePOS=completePOS;
+window.togglePosCustomerType=togglePosCustomerType;
+window.openTelecomModal=openTelecomModal;window.processTelecomPayment=processTelecomPayment;
+window.openUtilityModal=openUtilityModal;window.processUtilityPayment=processUtilityPayment;
+window.openDealerForm=openDealerForm;window.editDealer=editDealer;window.saveDealer=saveDealer;window.dealerStatement=dealerStatement;
+window.filterTable=filterTable;window.openEntity=openEntity;window.saveEntity=saveEntity;window.customerStatement=customerStatement;
+window.openItemCreate=openItemCreate;window.editItem=editItem;window.saveItem=saveItem;window.createItem=createItem;
+window.receiveStock=receiveStock;window.transferStock=transferStock;window.returnStock=returnStock;window.openCredit=openCredit;window.saveCredit=saveCredit;
+window.printAR=printAR;window.printCustomerSales=printCustomerSales;window.openUser=openUser;window.saveUser=saveUser;window.toggleUser=toggleUser;window.openSalesperson=openSalesperson;window.saveSP=saveSP;
+window.readCSV=readCSV;window.importCSV=importCSV;window.downloadTemplate=downloadTemplate;window.backupJSON=backupJSON;window.restoreJSON=restoreJSON;window.clearLocalData=clearLocalData;
+window.settingsTab=settingsTab;window.saveSettings=saveSettings;window.setBrand=setBrand;window.openRecurring=openRecurring;window.saveRecurring=saveRecurring;
+window.openBusinessProfile=openBusinessProfile;window.printMailMerge=printMailMerge;window.nextNo=nextNo;
+
+if(!sessionStorage.getItem('rst_auth'))renderLogin();else renderApp();
+
+})();
+</script>
+</body>
+</html>
